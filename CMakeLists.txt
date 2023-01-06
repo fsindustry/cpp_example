@@ -3,6 +3,7 @@ project(cpp_example)
 
 set(CMAKE_CXX_STANDARD 14)
 
+include_directories(include)
 add_executable(cpp_example main.cpp)
 add_executable(shared_ptr shared_ptr/shared_ptr_example.cpp)
 add_executable(unique_ptr unique_ptr/unique_ptr_example.cpp)
@@ -12,3 +13,5 @@ add_executable(demo1_shallow_copy rvalue_reference/demo1_shallow_copy.cpp)
 add_executable(demo1_deep_copy rvalue_reference/demo1_deep_copy.cpp)
 add_executable(demo1_move_constructor rvalue_reference/demo1_move_constructor.cpp)
 add_executable(demo2_move_semantics rvalue_reference/demo2_move_semantics.cpp)
+add_executable(demo3_forward rvalue_reference/demo3_forward.cpp)
+add_executable(demo4_emplace_back rvalue_reference/demo4_emplace_back.cpp)
