@@ -28,5 +28,14 @@ add_executable(demo1_lambda lambda/demo1_lambda.cpp)
 add_executable(demo1_thread_quickstart thread/demo1_thread_quickstart.cpp)
 add_executable(demo2_thread_basic thread/demo2_thread_basic.cpp)
 
+# mutex
+add_executable(demo1_mutex mutex/demo1_mutex.cpp)
+add_executable(demo2_recursive_mutex mutex/demo2_recursive_mutex.cpp)
+add_executable(demo3_timed_mutex mutex/demo3_timed_mutex.cpp)
+add_executable(demo4_lock_guard mutex/demo4_lock_guard.cpp)
+add_executable(demo5_unique_lock mutex/demo5_unique_lock.cpp)
+
+
+
 
 
