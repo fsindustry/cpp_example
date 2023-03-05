@@ -35,6 +35,24 @@ add_executable(demo3_timed_mutex mutex/demo3_timed_mutex.cpp)
 add_executable(demo4_lock_guard mutex/demo4_lock_guard.cpp)
 add_executable(demo5_unique_lock mutex/demo5_unique_lock.cpp)
 
+# condition variable
+add_executable(demo1_sync_queue condition_variable/demo1_sync_queue.cpp)
+add_executable(demo2_sync_queue condition_variable/demo2_sync_queue.cpp)
+
+# atomic
+add_executable(demo1_atomic_quickstart atomic/demo1_atomic_quickstart.cpp)
+
+# future
+add_executable(demo1_future future/demo1_future.cpp)
+add_executable(demo2_package_task future/demo2_package_task.cpp)
+add_executable(demo3_promise future/demo3_promise.cpp)
+
+# other concurrent tools
+add_executable(demo1_call_once concurrent_tools/demo1_call_once.cpp)
+add_executable(demo2_function concurrent_tools/demo2_function.cpp)
+add_executable(demo3_bind concurrent_tools/demo3_bind.cpp)
+
+
 
 
 
