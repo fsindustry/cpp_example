@@ -1,18 +1,15 @@
-//
-// Created by fsindustry on 2023/3/5.
-//
 #include <iostream>       // std::cout
 #include <thread>         // std::thread
 #include <mutex>          // std::mutex
 
-volatile int counter(0); // non-atomic running_count
-std::mutex mtx;           // locks access to running_count
+volatile int counter(0); // non-atomic counter
+std::mutex mtx;           // locks access to counter
 
 void increases_10k() {
   for (int i = 0; i < 10000; ++i) {
     // 1. 使用try_lock的情况：计数器不一定到10000
     //    if (mtx.try_lock()) {   // only increase if currently not locked:
-    //      ++running_count;
+    //      ++counter;
     //      mtx.unlock();
     //    }
 
@@ -31,7 +28,7 @@ int main() {
     threads[i] = std::thread(increases_10k);
 
   for (auto &th: threads) th.join();
-  std::cout << " successful increases of the running_count " << counter << std::endl;
+  std::cout << " successful increases of the counter " << counter << std::endl;
 
   return 0;
 }
