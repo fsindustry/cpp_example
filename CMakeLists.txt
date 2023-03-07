@@ -52,12 +52,15 @@ add_executable(demo1_call_once concurrent_tools/demo1_call_once.cpp)
 add_executable(demo2_function concurrent_tools/demo2_function.cpp)
 add_executable(demo3_bind concurrent_tools/demo3_bind.cpp)
 
-
 # variable parameter
 add_executable(demo1_var_param variable_parameter/demo1_var_param.cpp)
 add_executable(demo2_var_param_by_recursive variable_parameter/demo2_var_param_by_recursive.cpp)
 add_executable(demo3_var_param_by_comma variable_parameter/demo3_var_param_by_comma.cpp)
 add_executable(demo4_var_param_forward variable_parameter/demo4_var_param_forward.cpp)
+
+# thread pool
+add_executable(demo_threadpool thread_pool/test_threadpool.cpp thread_pool/demo_threadpool.cpp)
+
 
 
 

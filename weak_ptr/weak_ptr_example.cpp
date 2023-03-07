@@ -28,7 +28,7 @@ void demo_scope() {
     {
         std::shared_ptr<int> sp(new int(1));
         wp = sp;
-        sp_ok = wp.lock(); // will increase the counter
+        sp_ok = wp.lock(); // will increase the running_count
         assert(sp_ok.use_count() == 2);
     }
     if (wp.expired()) {
