@@ -61,6 +61,14 @@ add_executable(demo4_var_param_forward variable_parameter/demo4_var_param_forwar
 # thread pool
 add_executable(demo_threadpool thread_pool/test_threadpool.cpp thread_pool/demo_threadpool.cpp)
 
+# exception
+add_executable(demo1_exception_basic exception/demo1_exception_basic.cpp)
+add_executable(demo2_custom_exception exception/demo2_custom_exception.cpp)
+add_executable(demo3_exception_ptr exception/demo3_exception_ptr.cpp)
+add_executable(demo4_nested_exception exception/demo4_nested_exception.cpp)
+
+
+
 
 
 
