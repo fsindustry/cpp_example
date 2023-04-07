@@ -1,0 +1,5 @@
+# exception
+add_executable(demo1_exception_basic demo1_exception_basic.cpp)
+add_executable(demo2_custom_exception demo2_custom_exception.cpp)
+add_executable(demo3_exception_ptr demo3_exception_ptr.cpp)
+add_executable(demo4_nested_exception demo4_nested_exception.cpp)

@@ -1,0 +1,11 @@
+include_directories(../include)
+
+# right reference
+add_executable(rvalue_reference rvalue_reference.cpp)
+add_executable(demo1_shallow_copy demo1_shallow_copy.cpp)
+add_executable(demo1_deep_copy demo1_deep_copy.cpp)
+add_executable(demo1_move_constructor demo1_move_constructor.cpp)
+add_executable(demo2_move_semantics demo2_move_semantics.cpp)
+add_executable(demo3_forward demo3_forward.cpp)
+add_executable(demo4_emplace_back demo4_emplace_back.cpp)
+add_executable(demo5_emplace_back demo5_emplace_back.cpp)

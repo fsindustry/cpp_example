@@ -1,0 +1,6 @@
+# mutex
+add_executable(demo1_mutex demo1_mutex.cpp)
+add_executable(demo2_recursive_mutex demo2_recursive_mutex.cpp)
+add_executable(demo3_timed_mutex demo3_timed_mutex.cpp)
+add_executable(demo4_lock_guard demo4_lock_guard.cpp)
+add_executable(demo5_unique_lock demo5_unique_lock.cpp)

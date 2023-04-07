@@ -1,0 +1,3 @@
+# thread
+add_executable(demo1_thread_quickstart demo1_thread_quickstart.cpp)
+add_executable(demo2_thread_basic demo2_thread_basic.cpp)
