@@ -3,6 +3,7 @@ project(cpp_example)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# demo executable
 add_executable(cpp_example main.cpp)
 
 # shared_ptr / unique_ptr / weak_ptr
@@ -29,6 +30,8 @@ add_subdirectory(variable_parameter)
 add_subdirectory(thread_pool)
 # exception
 add_subdirectory(exception)
+# network
+add_subdirectory(network)
 
 
 
