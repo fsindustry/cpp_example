@@ -46,6 +46,7 @@ int main() {
   }
 }
 
+// 客户端处理线程
 void *routine(void *args) {
   int clientfd = *(int *) args;
 
