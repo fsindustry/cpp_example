@@ -1,1 +1,3 @@
 add_executable(demo1_socket demo1_socket.cpp)
+add_executable(demo2_select demo2_select.cpp)
+add_executable(demo3_epoll demo3_epoll.cpp)
