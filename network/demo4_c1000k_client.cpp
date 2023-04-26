@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #define MAX_BUFFER    128
-#define MAX_EPOLLSIZE  (384*1024)
+#define MAX_EPOLLSIZE  (100*1024)
 #define MAX_PORT    100
 
 // 计算耗时间隔，入参类型为timeval
@@ -60,8 +60,8 @@ int main(int argc, char **argv) {
     epoll_event ev;
     int sockfd = 0;
 
-    // 最大创建340000个客户端连接
-    if (connections < 340000 && !isContinue) {
+    // 最大创建10w个客户端连接
+    if (connections < 100000 && !isContinue) {
       // 1. 创建socket句柄
       sockfd = socket(AF_INET, SOCK_STREAM, 0);
       if (sockfd == -1) {
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     }
 
     // 每创建1000个连接，处理一次epoll事件
-    if (connections % 1000 == 999 || connections >= 340000) {
+    if (connections % 1000 == 999 || connections >= 100000) {
       timeval tv_cur;
 
       gettimeofday(&tv_cur, NULL);

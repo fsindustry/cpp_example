@@ -163,6 +163,8 @@ int main() {
         printf("sent: %d\n", sent);
 
         // 注册客户端fd读事件
+        ev.events = EPOLLIN;
+        ev.data.fd = eventfd;
         epoll_ctl(r->epoll_fd, EPOLL_CTL_MOD, eventfd, &ev);
       }
     }
