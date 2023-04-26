@@ -120,7 +120,7 @@ void demo_threadpool::run() {
 
 
 void getNow(timeval *tv) {
-  gettimeofday(tv, DST_NONE);
+  gettimeofday(tv, nullptr);
 }
 
 int64_t getNowMs() {

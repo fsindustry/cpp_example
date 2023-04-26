@@ -3,6 +3,10 @@ project(cpp_example)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# 查找 pthread 库
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # demo executable
 add_executable(cpp_example main.cpp)
 

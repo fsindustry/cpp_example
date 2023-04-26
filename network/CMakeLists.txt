@@ -1,4 +1,6 @@
 add_executable(demo1_socket demo1_socket.cpp)
+target_link_libraries(demo1_socket PRIVATE Threads::Threads)
+
 add_executable(demo2_select demo2_select.cpp)
 add_executable(demo3_epoll demo3_epoll.cpp)
 add_executable(demo4_c1000k_server demo4_c1000k_server.cpp)
