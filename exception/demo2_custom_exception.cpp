@@ -9,12 +9,12 @@ using namespace std;
 // 自定义异常
 class my_exception : public exception {
 public:
-  const char *what() const throw() { //throw () 表示不允许任何异常产生
+  const char *what() const noexcept { //throw () 表示不允许任何异常产生
     return "ERROR! Don't divide a number by integer zero.\n";
   }
 };
 
-void check(int y) throw(my_exception) { // 表示只允许抛出my_exception异常
+void check(int y) noexcept(false) { // 表示只允许抛出my_exception异常
   // 抛出自定义异常
   if (y == 0) throw my_exception();
 }

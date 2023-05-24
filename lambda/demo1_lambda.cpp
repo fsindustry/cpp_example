@@ -2,6 +2,7 @@
 // Created by fsindustry on 2023/1/6.
 //
 #include <iostream>
+#include <memory>
 
 void test1() {
     // 有返回值的lambda表达式
