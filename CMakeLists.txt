@@ -32,6 +32,8 @@ add_subdirectory(thread_pool)
 add_subdirectory(exception)
 # network
 add_subdirectory(network)
+# valgrind
+add_subdirectory(valgrind)
 
 
 
