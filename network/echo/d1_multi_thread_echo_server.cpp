@@ -73,6 +73,8 @@ again:
   } else if (n < 0) {
     close(clientfd);
     err_msg("str_echo: read error");
+  } else if( n == 0 ){
+    close(clientfd);
   }
   return nullptr;
 }
