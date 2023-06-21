@@ -10,6 +10,10 @@ find_package(Threads REQUIRED)
 # demo executable
 add_executable(cpp_example main.cpp)
 
+# basic lib
+include_directories(basic_lib)
+add_subdirectory(basic_lib)
+
 # shared_ptr / unique_ptr / weak_ptr
 add_subdirectory(shared_ptr)
 # right reference
