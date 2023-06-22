@@ -20,10 +20,12 @@ void str_cli(FILE *fp, int sockfd);
 int main(int argc, char **argv) {
 
   // 0) 接收參數
-  if (argc != 3){
+  if (argc != 3) {
     err_quit("usage: program <IPaddress> <Port>");
   }
+  // 服务端ip地址
   const char *ip = argv[1];
+  // 服务端端口号
   int port = atoi(argv[2]);
 
   // 1）创建socket句柄
@@ -48,14 +50,17 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void str_cli(FILE *fp, int sockfd){
+void str_cli(FILE *fp, int sockfd) {
   char write_buf[BUFFER_LENGTH], read_buf[BUFFER_LENGTH];
-  while(Fgets(write_buf, BUFFER_LENGTH, fp)){
+  // 获取控制台输入
+  while (Fgets(write_buf, BUFFER_LENGTH, fp)) {
+    // 向服务端发送输入
     Writen(sockfd, write_buf, strlen(write_buf));
-    if(Readline(sockfd, read_buf,BUFFER_LENGTH) == 0){
+    // 读取服务端响应
+    if (Readline(sockfd, read_buf, BUFFER_LENGTH) == 0) {
       err_quit("str_cli: server terminated prematurely");
     }
-
-    Fputs(read_buf,stdout);
+    // 输出响应到客户端
+    Fputs(read_buf, stdout);
   }
 }

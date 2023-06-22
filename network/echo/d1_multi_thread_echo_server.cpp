@@ -1,9 +1,6 @@
 //
 // Created by fsindustry on 6/16/23.
 //
-//
-// Created by fsindustry on 2023/4/10.
-//
 
 #include <cstdio>
 #include <sys/socket.h>
@@ -49,11 +46,19 @@ int main() {
     socklen_t len = sizeof(client);
     // 5）循环等待客户端连接
     int clientfd = accept(listenfd, (struct sockaddr *) &client, &len);
+    if (clientfd < 0) { // 处理中断信号
+      if (errno == EINTR)
+        continue;
+      else
+        err_sys("accept error");
+    }
 
     // 6）新开线程处理客户端请求
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, str_echo, &clientfd);
   }
+
+  return 0;
 }
 
 // 客户端处理线程
@@ -61,19 +66,19 @@ void *str_echo(void *args) {
   int clientfd = *(int *) args;
   unsigned char buffer[BUFFER_LENGTH] = {0};
   ssize_t n;
-again:
+  again:
   // 读取客户端输入数据，并回写客户端
   while ((n = read(clientfd, buffer, BUFFER_LENGTH)) > 0) {
     write(clientfd, buffer, n);
     printf("buffer: %s, ret: %d\n", buffer, n);
   }
 
-  if (n < 0 && errno == EINTR) {
+  if (n < 0 && errno == EINTR) { // 处理中断信号，直接重试
     goto again;
-  } else if (n < 0) {
+  } else if (n < 0) { // 其它错误关闭fd
     close(clientfd);
     err_msg("str_echo: read error");
-  } else if( n == 0 ){
+  } else if (n == 0) { // 若对端关闭，则也关闭fd
     close(clientfd);
   }
   return nullptr;
