@@ -45,7 +45,7 @@
 #ifdef	HAVE_SYS_PARAM_H
 # include	<sys/param.h>	/* OpenBSD prereq for sysctl.h */
 #endif
-# include	<sys/sysctl.h>
+// # include	<sys/sysctl.h>
 #endif
 
 #ifdef	HAVE_POLL_H
