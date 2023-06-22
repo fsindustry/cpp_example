@@ -11,5 +11,21 @@ add_executable(d1_echo_client echo/d1_echo_client.cpp)
 target_link_libraries(d1_echo_client basic_lib)
 add_executable(d1_multi_thread_echo_server echo/d1_multi_thread_echo_server.cpp)
 target_link_libraries(d1_multi_thread_echo_server Threads::Threads basic_lib)
+
 add_executable(d2_multi_process_echo_server echo/d2_multi_process_echo_server.cpp)
 target_link_libraries(d2_multi_process_echo_server basic_lib)
+
+add_executable(d3_select_echo_client echo/d3_select_echo_client.cpp)
+target_link_libraries(d3_select_echo_client basic_lib)
+add_executable(d3_select_echo_server echo/d3_select_echo_server.cpp)
+target_link_libraries(d3_select_echo_server basic_lib)
+
+add_executable(d4_poll_echo_client echo/d4_poll_echo_client.cpp)
+target_link_libraries(d4_poll_echo_client basic_lib)
+add_executable(d4_poll_echo_server echo/d4_poll_echo_server.cpp)
+target_link_libraries(d4_poll_echo_server basic_lib)
+
+add_executable(d5_epoll_echo_client echo/d5_epoll_echo_client.cpp)
+target_link_libraries(d5_epoll_echo_client basic_lib)
+add_executable(d5_epoll_echo_server echo/d5_epoll_echo_server.cpp)
+target_link_libraries(d5_epoll_echo_server basic_lib)
