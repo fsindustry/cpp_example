@@ -24,6 +24,16 @@ void sig_chld(int signo);
 
 int main() {
 
+  int i, maxfd, connfd, sockfd;
+  int nready;
+  ssize_t n;
+  fd_set rset, allset;
+  char buf[BUFFER_LENGTH];
+  int maxidx = -1;
+  int client[FD_SETSIZE];
+  memset(client, -1, FD_SETSIZE);
+  struct sockaddr_in clientaddr;
+
   // 1）创建socket句柄
   int listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
   if (listenfd == -1) return -1;
@@ -43,64 +53,66 @@ int main() {
   // 4）开启监听
   listen(listenfd, BACKLOG_SIZE);
 
-  // 5）注册SIGCHLD信号处理函数，处理子进程信号
-  Signal(SIGCHLD, sig_chld);
+  // 5）注册listenfd读事件
+  FD_ZERO(&allset);
+  FD_SET(listenfd, &allset);
 
-  pid_t childpid;
-  while (1) {
-    struct sockaddr_in client;
-    socklen_t len = sizeof(client);
-    // 5）循环等待客户端连接
-    int clientfd = accept(listenfd, (struct sockaddr *) &client, &len);
-    if (clientfd < 0) { // 处理中断信号
-      if (errno == EINTR)
-        continue;
-      else
-        err_sys("accept error");
+  maxfd = listenfd;
+  for (;;) {
+
+    // 6）获取监听事件
+    // 每次从现有fd_set中拷贝一份，作为select()入参，防止状态被select更改；
+    rset = allset;
+    nready = select(maxfd + 1, &rset, NULL, NULL, NULL);
+
+    // 7）若有新的连接到来，则添加到监听的fd_set中
+    if (FD_ISSET(listenfd, &rset)) {
+      socklen_t len = sizeof(clientaddr);
+      // 接收客户端连接
+      int connfd = accept(listenfd, (struct sockaddr *) &clientaddr, &len);
+      if (connfd < 0) { // 处理中断信号
+        if (errno == EINTR)
+          continue;
+        else
+          err_sys("accept error");
+      }
+
+      // 在client中找一个位置，存放connfd
+      for (i = 0; i < FD_SETSIZE; i++) {
+        if (client[i] < 0) {
+          client[i] = connfd;
+          break;
+        }
+      }
+
+      if (i == FD_SETSIZE) {
+        err_quit("too many clients");
+      }
+
+      // 注册connfd到监听fd_set中
+      FD_SET(connfd, &allset);
+      if (connfd > maxfd) maxfd = connfd;
+      if (i > maxidx) maxidx = i;
+      if (--nready <= 0) continue;
     }
 
-    // 6）新开子进程处理客户端请求
-    if ((childpid = fork()) == 0) { // child process
-      close(listenfd);
-      str_echo(clientfd);
-      exit(0);
-    } else { // parent process
-      close(clientfd);
+    // 8）若有客户端连接的读事件，则处理读事件
+    for (i = 0; i <= maxidx; i++) {
+      if ((sockfd = client[i]) < 0) continue;
+
+      if (FD_ISSET(sockfd, &rset)) {
+        if ((n = read(sockfd, buf, BUFFER_LENGTH)) <= 0) { // 连接关闭或出错，则关闭，并注销监听
+          close(sockfd);
+          FD_CLR(sockfd, &allset);
+          client[i] = -1;
+        } else { // 读取到数据，则回写数据给客户端
+          write(sockfd, buf, n);
+        }
+
+        if (--nready <= 0) break;
+      }
     }
   }
 
   return 0;
-}
-
-// 客户端处理线程
-void *str_echo(void *args) {
-  int clientfd = *(int *) args;
-  unsigned char buffer[BUFFER_LENGTH] = {0};
-  ssize_t n;
-  again:
-  // 读取客户端输入数据，并回写客户端
-  while ((n = read(clientfd, buffer, BUFFER_LENGTH)) > 0) {
-    write(clientfd, buffer, n);
-    printf("buffer: %s, ret: %d\n", buffer, n);
-  }
-
-  if (n < 0 && errno == EINTR) { // 处理中断信号，直接重试
-    goto again;
-  } else if (n < 0) { // 其它错误关闭fd
-    close(clientfd);
-    err_msg("str_echo: read error");
-  } else if (n == 0) { // 若对端关闭，则也关闭fd
-    close(clientfd);
-  }
-  return nullptr;
-}
-
-// SIGCHLD 信号处理函数
-void sig_chld(int signo) {
-  pid_t pid;
-  int stat;
-
-  while ((pid = waitpid(-1, &stat, WNOHANG)) > 0)
-    printf("child %d terminated\n", pid);
-  return;
 }
