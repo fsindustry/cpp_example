@@ -69,7 +69,7 @@ int main() {
     if (FD_ISSET(listenfd, &rset)) {
       socklen_t len = sizeof(clientaddr);
       // 接收客户端连接
-      int connfd = accept(listenfd, (struct sockaddr *) &clientaddr, &len);
+      connfd = accept(listenfd, (struct sockaddr *) &clientaddr, &len);
       if (connfd < 0) { // 处理中断信号
         if (errno == EINTR)
           continue;
