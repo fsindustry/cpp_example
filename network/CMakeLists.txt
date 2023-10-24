@@ -29,3 +29,6 @@ add_executable(d5_epoll_echo_client echo/d5_epoll_echo_client.cpp)
 target_link_libraries(d5_epoll_echo_client basic_lib)
 add_executable(d5_epoll_echo_server echo/d5_epoll_echo_server.cpp)
 target_link_libraries(d5_epoll_echo_server basic_lib)
+
+
+add_executable(sync_dns_client dns/sync_dns_client.cpp)
