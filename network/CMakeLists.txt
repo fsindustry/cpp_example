@@ -32,3 +32,6 @@ target_link_libraries(d5_epoll_echo_server basic_lib)
 
 
 add_executable(sync_dns_client dns/sync_dns_client.cpp)
+
+add_executable(async_dns_client dns/async_dns_client.cpp)
+target_link_libraries(async_dns_client Threads::Threads)

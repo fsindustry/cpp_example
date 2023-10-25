@@ -10,6 +10,10 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <ctime>
+#include <sys/epoll.h>
+#include <csignal>
+#include <thread>
+#include <fcntl.h>
 
 // the first DNS service address in China
 #define DNS_SVR             "114.114.114.114"
@@ -17,6 +21,8 @@
 
 #define DNS_HOST            0x01
 #define DNS_CNAME           0x05
+
+#define ASYNC_CLIENT_NUM        1024
 
 struct dns_header {
   unsigned short id;
@@ -37,6 +43,17 @@ struct dns_question {
 struct dns_item {
   char *domain;
   char *ip;
+};
+
+struct async_context {
+  int epoll_fd;
+};
+
+typedef void (*async_result_cb)(struct dns_item *list, int count);
+
+struct ep_arg {
+  int sockfd; // client socket fd
+  async_result_cb cb; // callback for event
 };
 
 
@@ -91,6 +108,21 @@ int dns_create_question(struct dns_question *question, const char *hostname) {
 static int is_pointer(int in) {
   // 0xC0 == 1100 0000
   return ((in & 0xC0) == 0xC0);
+}
+
+static int set_block(int fd, int block) {
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags < 0) return flags;
+
+  if (block) {
+    flags &= ~O_NONBLOCK;
+  } else {
+    flags |= O_NONBLOCK;
+  }
+
+  if (fcntl(fd, F_SETFL, flags) < 0) return -1;
+
+  return 0;
 }
 
 int dns_build_request(struct dns_header *header, struct dns_question *question, char *request) {
@@ -223,8 +255,82 @@ static int dns_parse_response(unsigned char *buffer, struct dns_item **domains) 
   return cnt;
 }
 
+void dns_async_client_free_domains(struct dns_item *list, int count) {
+  int i = 0;
 
-int dns_client_commit(const char *domain) {
+  for (i = 0; i < count; i++) {
+    free(list[i].domain);
+    free(list[i].ip);
+  }
+
+  free(list);
+}
+
+static void *dns_async_client_proc(void *arg) {
+  struct async_context *ctx = (struct async_context *) arg;
+
+  int epoll_fd = ctx->epoll_fd;
+  while (1) {
+    struct epoll_event events[ASYNC_CLIENT_NUM] = {0};
+    int nready = epoll_wait(epoll_fd, events, ASYNC_CLIENT_NUM, -1);
+    if (nready < 0) {
+      if (errno == EINTR || errno == EAGAIN) {
+        continue;
+      } else {
+        break;
+      }
+    } else if (nready == 0) {
+      continue;
+    }
+
+    printf("nready:%d\n", nready);
+    int i = 0;
+    for (i = 0; i < nready; i++) {
+      struct ep_arg *data = (struct ep_arg *) events[i].data.ptr;
+      int sockfd = data->sockfd;
+
+      char buffer[1024] = {0};
+      struct sockaddr_in addr;
+      size_t addr_len = sizeof(struct sockaddr_in);
+      int n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *) &addr, (socklen_t *) &addr_len);
+
+      struct dns_item *domain_list = NULL;
+      int count = dns_parse_response((unsigned char *) buffer, &domain_list);
+
+      data->cb(domain_list, count);
+      int ret = epoll_ctl(epoll_fd, EPOLL_CTL_DEL, sockfd, NULL);
+      close(sockfd);
+      dns_async_client_free_domains(domain_list, count);
+      free(data);
+    }
+  }
+}
+
+
+struct async_context *dns_async_client_init(void) {
+
+  int epoll_fd = epoll_create(1);
+  if (epoll_fd < 0)return NULL;
+
+  struct async_context *ctx = (async_context *) calloc(1, sizeof(struct async_context));
+  if (ctx == NULL) {
+    close(epoll_fd);
+    return NULL;
+  }
+  ctx->epoll_fd = epoll_fd;
+
+  pthread_t thread_id;
+  int ret = pthread_create(&thread_id, NULL, dns_async_client_proc, ctx);
+  if (ret) {
+    perror("pthread_create");
+    return NULL;
+  }
+//  usleep(1);
+  return ctx;
+}
+
+
+int dns_async_client_commit(struct async_context *ctx, const char *domain, async_result_cb cb) {
 
   printf("url:%s\n", domain);
 
@@ -234,6 +340,7 @@ int dns_client_commit(const char *domain) {
     perror("create socket fialed\n");
     exit(-1);
   }
+  set_block(sockfd, 0);
 
   // connect DNS server
   sockaddr_in dest;
@@ -242,7 +349,6 @@ int dns_client_commit(const char *domain) {
   dest.sin_port = htons(53);
   dest.sin_addr.s_addr = inet_addr(DNS_SVR);
   int ret = connect(sockfd, (struct sockaddr *) &dest, sizeof(dest));
-  printf("connect: %d\n", ret);
 
   struct dns_header header = {0};
   dns_create_header(&header);
@@ -254,17 +360,17 @@ int dns_client_commit(const char *domain) {
   int req_len = dns_build_request(&header, &question, request);
   int slen = sendto(sockfd, request, req_len, 0, (struct sockaddr *) &dest, sizeof(struct sockaddr));
 
-  char buffer[1024] = {0};
-  struct sockaddr_in addr;
-  size_t addr_len = sizeof(struct sockaddr_in);
+  struct ep_arg *eparg = (struct ep_arg *) calloc(1, sizeof(struct ep_arg));
+  if (eparg == NULL) return -1;
+  eparg->sockfd = sockfd;
+  eparg->cb = cb;
 
-  int n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *) &addr, (socklen_t *) &addr_len);
+  struct epoll_event ev;
+  ev.data.ptr = eparg;
+  ev.events = EPOLLIN;
+  ret = epoll_ctl(ctx->epoll_fd, EPOLL_CTL_ADD, sockfd, &ev);
 
-  printf("recvfrom n: %d\n", n);;
-  struct dns_item *domains = NULL;
-  dns_parse_response((unsigned char *)buffer, &domains);
-
-  return 0;
+  return ret;
 }
 
 
@@ -315,11 +421,23 @@ char *domain[] = {
     "ct.ctrip.com"
 };
 
+static void dns_async_client_result_callback(struct dns_item *list, int count) {
+  int i = 0;
+
+  for (i = 0; i < count; i++) {
+    printf("name:%s, ip:%s\n", list[i].domain, list[i].ip);
+  }
+}
 
 int main(int argc, char **argv) {
+
+  struct async_context *ctx = dns_async_client_init();
+  if (ctx == NULL) return -2;
+
+
   int count = sizeof(domain) / sizeof(domain[0]);
   for (int i = 0; i < count; i++) {
-    dns_client_commit(domain[i]);
+    dns_async_client_commit(ctx, domain[i], dns_async_client_result_callback);
   }
   getchar();
 }
