@@ -10,6 +10,7 @@
 #include <cstring>
 #include <arpa/inet.h>
 #include <ctime>
+#include <unistd.h>
 
 // the first DNS service address in China
 #define DNS_SVR             "114.114.114.114"
@@ -263,6 +264,7 @@ int dns_client_commit(const char *domain) {
   printf("recvfrom n: %d\n", n);;
   struct dns_item *domains = NULL;
   dns_parse_response((unsigned char *)buffer, &domains);
+  close(sockfd);
 
   return 0;
 }
