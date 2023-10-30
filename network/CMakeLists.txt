@@ -40,3 +40,6 @@ add_executable(d6_udp_echo_server udp/d6_udp_echo_server.cpp)
 target_link_libraries(d6_udp_echo_server basic_lib)
 add_executable(d6_udp_echo_client udp/d6_udp_echo_client.cpp)
 target_link_libraries(d6_udp_echo_client basic_lib)
+
+add_executable(d7_udp_tcp_select_echo_server udp/d7_udp_tcp_select_echo_server.cpp)
+target_link_libraries(d7_udp_tcp_select_echo_server basic_lib)

@@ -219,15 +219,15 @@ Sysconf(int name)
 	return(val);
 }
 
-#ifdef	HAVE_SYS_SYSCTL_H
-void
-Sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp,
-	   void *newp, size_t newlen)
-{
-	if (sysctl(name, namelen, oldp, oldlenp, newp, newlen) == -1)
-		err_sys("sysctl error");
-}
-#endif
+//#ifdef	HAVE_SYS_SYSCTL_H
+//void
+//Sysctl(int *name, u_int namelen, void *oldp, size_t *oldlenp,
+//	   void *newp, size_t newlen)
+//{
+//	if (sysctl(name, namelen, oldp, oldlenp, newp, newlen) == -1)
+//		err_sys("sysctl error");
+//}
+//#endif
 
 void
 Unlink(const char *pathname)
