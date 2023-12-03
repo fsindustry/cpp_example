@@ -42,6 +42,8 @@ add_subdirectory(exception)
 add_subdirectory(network)
 # valgrind
 add_subdirectory(valgrind)
+# longjmp
+add_subdirectory(longjmp)
 
 
 
