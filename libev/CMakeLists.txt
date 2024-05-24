@@ -1,0 +1,5 @@
+add_executable(libev_echo_server demo1_echo_server.cpp)
+target_link_libraries(libev_echo_server ev)
+
+add_executable(libev_echo_client demo1_echo_client.cpp)
+target_link_libraries(libev_echo_client ev)

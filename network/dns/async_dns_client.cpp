@@ -14,6 +14,7 @@
 #include <csignal>
 #include <thread>
 #include <fcntl.h>
+#include <unistd.h>
 
 // the first DNS service address in China
 #define DNS_SVR             "114.114.114.114"
